@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import Order, Dish, DishOrder, Table
+from .models import Order, Item, ItemOrder, Table
 
 
-class DishInline(admin.TabularInline):
-    model = DishOrder
-    fields = ('dish', 'amount')
+class ItemInline(admin.TabularInline):
+    model = ItemOrder
+    fields = ('item', 'amount')
     extra = 1
     verbose_name = 'Строка в заказе'
     verbose_name_plural = 'Строки в заказе'
@@ -19,18 +19,18 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('table_number',)
     list_filter = ('table_number', 'status')
     filter_horizontal = ('items',)
-    inlines = (DishInline,)
+    inlines = (ItemInline,)
 
 
-class DishAdmin(admin.ModelAdmin):
+class ItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'description', 'price')
     search_fields = ('title',)
 
 
-class DishOrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'dish', 'order', 'amount')
-    search_fields = ('dish', 'order')
-    list_filter = ('dish',)
+class ItemOrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'item', 'order', 'amount')
+    search_fields = ('item', 'order')
+    list_filter = ('item',)
 
 
 class TableAdmin(admin.ModelAdmin):
@@ -39,6 +39,6 @@ class TableAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Order, OrderAdmin)
-admin.site.register(Dish, DishAdmin)
+admin.site.register(Item, ItemAdmin)
 admin.site.register(Table, TableAdmin)
-admin.site.register(DishOrder, DishOrderAdmin)
+admin.site.register(ItemOrder, ItemOrderAdmin)

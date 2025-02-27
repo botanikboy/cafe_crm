@@ -13,7 +13,7 @@ class Table(models.Model):
         return f'Столик №{self.number}'
 
 
-class Dish(models.Model):
+class Item(models.Model):
     title = models.CharField('Название', max_length=128)
     description = models.TextField(
         'Описание', max_length=1024, blank=True, null=True)
@@ -28,13 +28,13 @@ class Dish(models.Model):
         return self.title
 
 
-class DishOrder(models.Model):
-    dish = models.ForeignKey(
-        Dish, on_delete=models.CASCADE, related_name='orders',
+class ItemOrder(models.Model):
+    item = models.ForeignKey(
+        Item, on_delete=models.CASCADE, related_name='orders',
         verbose_name='Блюдо'
     )
     order = models.ForeignKey(
-        'Order', on_delete=models.CASCADE, related_name='dishes',
+        'Order', on_delete=models.CASCADE, related_name='items_in_oreder',
         verbose_name='Заказ'
     )
     amount = models.PositiveIntegerField('Количество')
@@ -42,10 +42,10 @@ class DishOrder(models.Model):
     class Meta:
         verbose_name = 'Позиция в заказе'
         verbose_name_plural = 'Позиции в заказах'
-        ordering = ('order', 'dish')
+        ordering = ('order', 'item')
 
     def __str__(self):
-        return f'{self.amount} × {self.dish.title} (Заказ {self.order.id})'
+        return f'{self.amount} × {self.item.title} (Заказ {self.order.id})'
 
 
 class Order(models.Model):
@@ -57,7 +57,7 @@ class Order(models.Model):
     table_number = models.ForeignKey(
         Table, on_delete=models.SET_NULL, null=True, blank=True)
     items = models.ManyToManyField(
-        Dish, through=DishOrder, verbose_name='Блюда в заказе')
+        Item, through=ItemOrder, verbose_name='Блюда в заказе')
     total_price = models.DecimalField(
         'Итоговая стоимость заказа',
         max_digits=10, decimal_places=2, default=0)
@@ -79,6 +79,7 @@ class Order(models.Model):
 
     def calculate_total_price(self):
         total = sum(
-            item.item.price * item.amount for item in self.dishes.all())
+            item.item.price * item.amount for item in self.items_in_order.all()
+        )
         self.total_price = total
         self.save()
