@@ -1,0 +1,262 @@
+[
+{
+    "model": "orders.table",
+    "pk": 1,
+    "fields": {
+        "number": 1
+    }
+},
+{
+    "model": "orders.table",
+    "pk": 2,
+    "fields": {
+        "number": 2
+    }
+},
+{
+    "model": "orders.table",
+    "pk": 3,
+    "fields": {
+        "number": 3
+    }
+},
+{
+    "model": "orders.item",
+    "pk": 1,
+    "fields": {
+        "title": "Пюрешка",
+        "description": "нежнейшая пюрешка из молоденьких картофелинок",
+        "price": "150.21"
+    }
+},
+{
+    "model": "orders.item",
+    "pk": 2,
+    "fields": {
+        "title": "Котлетька",
+        "description": "домашняя котлета",
+        "price": "250.10"
+    }
+},
+{
+    "model": "orders.item",
+    "pk": 3,
+    "fields": {
+        "title": "Компот",
+        "description": "",
+        "price": "100.00"
+    }
+},
+{
+    "model": "orders.item",
+    "pk": 4,
+    "fields": {
+        "title": "Салатик",
+        "description": "летний салат из овощей",
+        "price": "200.00"
+    }
+},
+{
+    "model": "orders.item",
+    "pk": 5,
+    "fields": {
+        "title": "Рибай",
+        "description": "Стейк из говядины",
+        "price": "1530.00"
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 1,
+    "fields": {
+        "item": 1,
+        "order": 1,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 2,
+    "fields": {
+        "item": 2,
+        "order": 1,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 3,
+    "fields": {
+        "item": 4,
+        "order": 1,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 4,
+    "fields": {
+        "item": 3,
+        "order": 2,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 5,
+    "fields": {
+        "item": 4,
+        "order": 3,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 6,
+    "fields": {
+        "item": 2,
+        "order": 4,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 7,
+    "fields": {
+        "item": 5,
+        "order": 5,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 8,
+    "fields": {
+        "item": 3,
+        "order": 6,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 9,
+    "fields": {
+        "item": 1,
+        "order": 7,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 10,
+    "fields": {
+        "item": 4,
+        "order": 7,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 11,
+    "fields": {
+        "item": 5,
+        "order": 7,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 12,
+    "fields": {
+        "item": 3,
+        "order": 7,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.itemorder",
+    "pk": 13,
+    "fields": {
+        "item": 2,
+        "order": 7,
+        "amount": 1
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 1,
+    "fields": {
+        "table_number": 1,
+        "total_price": "600.31",
+        "status": "PENDING",
+        "date_added": "2025-02-27T13:37:50.094Z",
+        "date_closed": null
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 2,
+    "fields": {
+        "table_number": 3,
+        "total_price": "100.00",
+        "status": "PAID",
+        "date_added": "2025-02-27T13:46:03.942Z",
+        "date_closed": "2025-02-27T13:46:29.279Z"
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 3,
+    "fields": {
+        "table_number": 2,
+        "total_price": "200.00",
+        "status": "PENDING",
+        "date_added": "2025-02-27T13:46:21.429Z",
+        "date_closed": null
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 4,
+    "fields": {
+        "table_number": 2,
+        "total_price": "250.10",
+        "status": "READY",
+        "date_added": "2025-02-27T13:47:28.874Z",
+        "date_closed": null
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 5,
+    "fields": {
+        "table_number": 2,
+        "total_price": "1530.00",
+        "status": "PAID",
+        "date_added": "2025-02-27T14:03:09.621Z",
+        "date_closed": "2025-02-27T14:21:30.833Z"
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 6,
+    "fields": {
+        "table_number": 3,
+        "total_price": "100.00",
+        "status": "PAID",
+        "date_added": "2025-02-27T14:11:53.060Z",
+        "date_closed": "2025-02-27T14:21:20.071Z"
+    }
+},
+{
+    "model": "orders.order",
+    "pk": 7,
+    "fields": {
+        "table_number": 1,
+        "total_price": "2230.31",
+        "status": "PENDING",
+        "date_added": "2025-02-27T14:12:11.600Z",
+        "date_closed": null
+    }
+}
+]
