@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='***your secret key***')
 
-DEBUG = os.getenv('DEBUG', default=True) in (True, 'True', 'true', '1')
+DEBUG = os.getenv('DEBUG', default=False) in (True, 'True', 'true', '1')
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'orders.apps.OrdersConfig',
+    'core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [
@@ -110,3 +111,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
