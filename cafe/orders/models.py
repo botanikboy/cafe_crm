@@ -57,7 +57,7 @@ class ItemOrder(models.Model):
     order = models.ForeignKey(
         'Order',
         on_delete=models.CASCADE,
-        related_name='items_in_oreder',
+        related_name='items_in_order',
         verbose_name='Заказ',
     )
     amount = models.PositiveIntegerField(
@@ -72,7 +72,7 @@ class ItemOrder(models.Model):
         ordering = ['order', 'item']
 
     def __str__(self):
-        return f'{self.amount} × {self.item.title} (Заказ {self.order.id})'
+        return f'{self.item.title} x {self.amount}'
 
     def save(self, *args, **kwargs):
         """Update total_price on change."""
@@ -95,9 +95,9 @@ class ItemOrder(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('PENDING', 'в ожидании'),
-        ('READY', 'готово'),
-        ('PAID', 'оплачено'),
+        ('1_READY', 'готово'),
+        ('2_PENDING', 'в ожидании'),
+        ('3_PAID', 'оплачено'),
     ]
     table_number = models.ForeignKey(
         Table,
@@ -120,7 +120,7 @@ class Order(models.Model):
     )
     status = models.CharField(
         'Статус',
-        max_length=8,
+        max_length=16,
         choices=STATUS_CHOICES,
         default='PENDING',
     )
@@ -139,7 +139,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
-        ordering = ['status', 'date_added']
+        ordering = ['-status', 'date_added']
 
     def __str__(self):
         return (
@@ -158,9 +158,9 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         """Update date_closed when order is paid."""
         self.full_clean()
-        if self.status == 'PAID' and self.date_closed is None:
+        if self.status == '3_PAID' and self.date_closed is None:
             self.date_closed = timezone.now()
-        elif self.status != 'PAID':
+        elif self.status != '3_PAID':
             self.date_closed = None
 
         super().save(*args, **kwargs)

@@ -188,7 +188,7 @@
     "fields": {
         "table_number": 1,
         "total_price": "600.31",
-        "status": "PENDING",
+        "status": "1_READY",
         "date_added": "2025-02-27T13:37:50.094Z",
         "date_closed": null
     }
@@ -199,9 +199,9 @@
     "fields": {
         "table_number": 3,
         "total_price": "100.00",
-        "status": "PAID",
+        "status": "2_PENDING",
         "date_added": "2025-02-27T13:46:03.942Z",
-        "date_closed": "2025-02-27T13:46:29.279Z"
+        "date_closed": null
     }
 },
 {
@@ -210,7 +210,7 @@
     "fields": {
         "table_number": 2,
         "total_price": "200.00",
-        "status": "PENDING",
+        "status": "2_PENDING",
         "date_added": "2025-02-27T13:46:21.429Z",
         "date_closed": null
     }
@@ -221,7 +221,7 @@
     "fields": {
         "table_number": 2,
         "total_price": "250.10",
-        "status": "READY",
+        "status": "1_READY",
         "date_added": "2025-02-27T13:47:28.874Z",
         "date_closed": null
     }
@@ -232,9 +232,9 @@
     "fields": {
         "table_number": 2,
         "total_price": "1530.00",
-        "status": "PAID",
+        "status": "1_READY",
         "date_added": "2025-02-27T14:03:09.621Z",
-        "date_closed": "2025-02-27T14:21:30.833Z"
+        "date_closed": null
     }
 },
 {
@@ -243,9 +243,9 @@
     "fields": {
         "table_number": 3,
         "total_price": "100.00",
-        "status": "PAID",
+        "status": "3_PAID",
         "date_added": "2025-02-27T14:11:53.060Z",
-        "date_closed": "2025-02-27T14:21:20.071Z"
+        "date_closed": "2025-02-28T08:26:07.963Z"
     }
 },
 {
@@ -254,9 +254,9 @@
     "fields": {
         "table_number": 1,
         "total_price": "2230.31",
-        "status": "PENDING",
+        "status": "3_PAID",
         "date_added": "2025-02-27T14:12:11.600Z",
-        "date_closed": null
+        "date_closed": "2025-02-28T08:26:18.984Z"
     }
 }
 ]

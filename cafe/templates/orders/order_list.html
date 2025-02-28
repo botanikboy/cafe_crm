@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Cafe_CRM. Список заказов
+{% endblock title %}
+
+{% block content %}
+  <div class="row mt-3">
+  <h1 class="pb-2 mb-0">Список заказов</h1>
+  </div>
+        <article class="mb-3">
+          <div class="card">
+            <div class="card-body">
+              <table class="table table-hover">
+                <thead>
+                  <tr class="table-secondary">
+                    <th scope="col">ID</th>
+                    <th scope="col">Стол</th>
+                    <th scope="col">Список блюд в заказе</th>
+                    <th scope="col">Общая стоимость, руб.</th>
+                    <th scope="col">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in page_obj %}
+                    <tr>
+                      <td>{{ order.id }}</td>
+                      <td>{{ order.table_number }}</td>
+                      <td>
+                        {% for item in order.items_in_order.all %}
+                          {{ forloop.counter }}. {{ item }}
+                          <br>
+                        {% endfor %}
+                      </td>
+                      <td>{{ order.total_price }}</td>
+                      <td>
+                        <span class="badge 
+                          {% if 'PAID' in order.status %}
+                            bg-success
+                          {% elif 'READY' in order.status %}
+                            bg-warning text-dark
+                          {% else %}
+                            bg-secondary
+                          {% endif %}
+                          text-light w-100 text-light">
+                          {{ order.get_status_display }}
+                        </span>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </article>
+  {% include "includes/pagination.html" %}
+{% endblock content %}
