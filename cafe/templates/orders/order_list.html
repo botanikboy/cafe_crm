@@ -24,7 +24,11 @@ Cafe_CRM. Список заказов
                 <tbody>
                   {% for order in page_obj %}
                     <tr>
-                      <td>{{ order.id }}</td>
+                      <td>
+                        <a href="{% url 'orders:order_edit' order.id %}">
+                          {{ order.id }}
+                        </a>
+                      </td>
                       <td>{{ order.table_number }}</td>
                       <td>
                         {% for item in order.items_in_order.all %}

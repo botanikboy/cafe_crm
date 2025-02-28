@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% block title %}
+  {% if '/edit' in request.path %}
+    Редактирование заказа
+  {% elif '/delete' in request.path %}
+    Удалить заказ
+  {% else %}
+    Новый заказ
+  {% endif %}
+{% endblock title %}
+{% block content %}
+{% with data=form.instance %}
+  <h2 class="row mt-3">
+    {% if '/edit' in request.path %}
+      Редактирование заказа "{{ data }}"
+    {% elif '/delete' in request.path %}
+      Удаление заказа {{ post }}
+    {% else %}
+      Новый заказ
+    {% endif %}
+  </h2>
+  <div class="card col-8">
+    <div class="card-header">
+      {% if '/edit' in request.path %}
+        Редактирование заказа "{{ data.title }}"
+      {% elif '/delete' in request.path %}
+        Удалить заказ?
+      {% else %}
+        Новый заказ
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if '/delete' in request.path %}
+          <p class="card-text">
+            <ul>
+              <li>ID: {{ order.id }}</li>
+              <li>Дата создания: {{ order.date_added }}</li>
+              <li>Стол: {{ order.table_number }}</li>
+              <li>Блюда в заказе:
+                <ol>
+                  {% for item in order.items_in_order.all %}
+                    <li>{{ item }}</li>
+                  {% endfor %}
+              </li>
+            </ul>
+          </p>
+          {% bootstrap_button button_type="submit" button_class="btn-danger" content="Удалить" onclick="return confirm('Вы уверены что хотите удалить заказ полностью?');" %}
+        {% else %}
+          {% bootstrap_form form %}
+          {% bootstrap_button button_type="submit" content="Сохранить" %}
+          <a href="{% url 'orders:order_delete' order.id %}" class="btn btn-outline-danger">Удалить</a>
+        {% endif %}
+        <input type=button class="btn btn-outline-dark" value="Отмена" onClick="javascript:history.go(-1);">
+      </form>
+    </div>
+  </div>
+{% endwith %}
+{% endblock content %}

@@ -25,6 +25,11 @@
           </a> 
           </li>
           <li class="nav-item">
+            <a class="nav-link {% if view_name  == 'orders:order_create' %}active{% endif %}" href="{% url 'orders:order_create' %}">
+                Создать новый заказ
+            </a> 
+            </li>
+          <li class="nav-item">
           <a class="nav-link {% if view_name  == 'orders:help' %}active{% endif %}" href="{% url 'orders:help' %}">
               Инструкция
           </a> 

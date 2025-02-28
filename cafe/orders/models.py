@@ -1,6 +1,6 @@
-from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.db import models
 from django.utils import timezone
 
 
@@ -104,6 +104,7 @@ class Order(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        verbose_name='Стол'
     )
     items = models.ManyToManyField(
         Item,
@@ -122,7 +123,7 @@ class Order(models.Model):
         'Статус',
         max_length=16,
         choices=STATUS_CHOICES,
-        default='PENDING',
+        default='2_PENDING',
     )
     date_added = models.DateTimeField(
         'Время создания',
@@ -143,8 +144,7 @@ class Order(models.Model):
 
     def __str__(self):
         return (
-            f"Заказ {self.id} от {self.date_added.isoformat(' ', 'seconds')} "
-            f"- {self.get_status_display()}"
+            f"Заказ {self.id} от {self.date_added.isoformat(' ', 'seconds')}"
         )
 
     def clean_table_number(self):
@@ -165,10 +165,10 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
-    def calculate_total_price(self):
+    def update_total_price(self):
         total = sum(
             item.item.price * item.amount
             for item in self.items_in_order.all()
         )
         self.total_price = total
-        self.save()
+        self.save(update_fields=['total_price'])
