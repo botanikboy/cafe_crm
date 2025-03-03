@@ -8,6 +8,9 @@ Cafe_CRM. Список заказов
   <div class="row mt-3">
   <h1 class="pb-2 mb-0">Список заказов</h1>
   </div>
+  <a href="{% url 'orders:order_create' %}" type="button" class="btn btn-primary btn-lg" >Новый заказ</a>
+  <br>
+  <br>
         <article class="mb-3">
           <div class="card">
             <div class="card-body">
@@ -23,7 +26,7 @@ Cafe_CRM. Список заказов
                 </thead>
                 <tbody>
                   {% for order in page_obj %}
-                    <tr>
+                    <tr onclick="window.location='{% url 'orders:order_edit' order.id %}';" style="cursor: pointer;">
                       <td>
                         <a href="{% url 'orders:order_edit' order.id %}">
                           {{ order.id }}

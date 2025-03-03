@@ -1,62 +1,172 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% load django_bootstrap5 %}
+
 {% block title %}
   {% if '/edit' in request.path %}
     Редактирование заказа
-  {% elif '/delete' in request.path %}
-    Удалить заказ
   {% else %}
     Новый заказ
   {% endif %}
 {% endblock title %}
+
 {% block content %}
-{% with data=form.instance %}
-  <h2 class="row mt-3">
+<div class="container mt-4">
+  <h1>
     {% if '/edit' in request.path %}
-      Редактирование заказа "{{ data }}"
-    {% elif '/delete' in request.path %}
-      Удаление заказа {{ post }}
+      Редактирование заказа "{{ form.instance }}"
     {% else %}
       Новый заказ
-    {% endif %}
-  </h2>
-  <div class="card col-8">
-    <div class="card-header">
-      {% if '/edit' in request.path %}
-        Редактирование заказа "{{ data.title }}"
-      {% elif '/delete' in request.path %}
-        Удалить заказ?
-      {% else %}
-        Новый заказ
-      {% endif %}
-    </div>
+    {% endif %}  
+  </h1>
+  <div class="card">
     <div class="card-body">
-      <form method="post" enctype="multipart/form-data">
+      <form method="post">
         {% csrf_token %}
-        {% if '/delete' in request.path %}
-          <p class="card-text">
-            <ul>
-              <li>ID: {{ order.id }}</li>
-              <li>Дата создания: {{ order.date_added }}</li>
-              <li>Стол: {{ order.table_number }}</li>
-              <li>Блюда в заказе:
-                <ol>
-                  {% for item in order.items_in_order.all %}
-                    <li>{{ item }}</li>
-                  {% endfor %}
-              </li>
-            </ul>
-          </p>
-          {% bootstrap_button button_type="submit" button_class="btn-danger" content="Удалить" onclick="return confirm('Вы уверены что хотите удалить заказ полностью?');" %}
-        {% else %}
-          {% bootstrap_form form %}
-          {% bootstrap_button button_type="submit" content="Сохранить" %}
+        {{ formset.management_form }}
+
+        <div class="mb-3">
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              {{ form.errors }}
+            </div>
+          {% endif %}
+          {% if not form.instance.pk %}
+            {% bootstrap_field form.table_number label_class='fs-4 fw-bold' %}
+          {% else %}
+            <label class="fs-4 fw-bold">Заказ для стола:</label>
+            <p tclass="fs-5">{{ form.instance.table_number }}</p>
+            {% bootstrap_field form.status label_class='fs-4 fw-bold' %}
+          {% endif %}
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover mb-2 mt-2" id="items-table">
+            <colgroup>
+              <col style="width: 50%;"> <!-- Блюдо -->
+              <col style="width: 25%;"> <!-- Количество -->
+              <col style="width: 25%;"> <!-- Удалить -->
+            </colgroup>
+            <thead class="table-light">
+              <tr>
+                <th>Блюдо</th>
+                <th>Количество</th>
+                <th>Удалить</th>
+              </tr>
+            </thead>
+            <tbody id="formset-body">
+              {% for form in formset %}
+              <tr>
+                <td>
+                  {{ form.item }}
+                  {{ form.id }}
+                  {% if form.item.errors %}
+                    <div class="text-danger">
+                      {{ form.item.errors }}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  {{ form.amount }}
+                  {% if form.amount.errors %}
+                    <div class="text-danger">
+                      {{ form.amount.errors }}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  {{ form.DELETE }}
+                  <button type="button" class="btn btn-outline-danger btn-sm remove-row">
+                    Удалить строку
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button type="button" id="add-row" class="btn btn-outline-primary btn-sm">
+            Добавить строку
+          </button>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">
+          Сохранить
+        </button>
+        {% if '/edit' in request.path %}
           <a href="{% url 'orders:order_delete' order.id %}" class="btn btn-outline-danger">Удалить</a>
         {% endif %}
-        <input type=button class="btn btn-outline-dark" value="Отмена" onClick="javascript:history.go(-1);">
+        <a href="{% url 'orders:orders_list' %}" class="btn btn-outline-dark">Отмена</a>
       </form>
     </div>
   </div>
-{% endwith %}
-{% endblock content %}
+</div>
+
+<style>
+  input[type="checkbox"][name$='-DELETE'] {
+    display: none;
+  }
+</style>
+
+<template id="empty-form-template">
+  <tr>
+    <td>__ITEM__ __ID__</td>
+    <td>__AMOUNT__</td>
+    <td>__DELETE__
+      <button type="button" class="btn btn-outline-danger btn-sm remove-row">
+        Удалить строку
+      </button>
+    </td>
+  </tr>
+</template>
+
+<script>
+  // Получаем счётчик форм
+  const totalForms = document.getElementById("id_form-TOTAL_FORMS");
+  // Подготавливаем кусочки пустой формы (меняем __prefix__ -> ___INDEX___)
+  let emptyItem   = `{{ formset.empty_form.item }}`.replace(/__prefix__/g, "___INDEX___");
+  let emptyId     = `{{ formset.empty_form.id }}`.replace(/__prefix__/g, "___INDEX___");
+  let emptyAmount = `{{ formset.empty_form.amount }}`.replace(/__prefix__/g, "___INDEX___");
+  let emptyDelete = `{{ formset.empty_form.DELETE }}`.replace(/__prefix__/g, "___INDEX___");
+
+  // При клике "Добавить строку"
+  document.getElementById("add-row").addEventListener("click", function() {
+    const formIndex = parseInt(totalForms.value);
+    let templateHtml = document.getElementById("empty-form-template").innerHTML;
+
+    // Подставляем реальные поля
+    templateHtml = templateHtml
+      .replace("__ITEM__", emptyItem.replace("___INDEX___", formIndex))
+      .replace("__ID__", emptyId.replace("___INDEX___", formIndex))
+      .replace("__AMOUNT__", emptyAmount.replace("___INDEX___", formIndex))
+      .replace("__DELETE__", emptyDelete.replace("___INDEX___", formIndex));
+
+    // Создаём <tr> из готовой строки
+    const tempWrapper = document.createElement("tbody");
+    tempWrapper.innerHTML = templateHtml;
+    const newRow = tempWrapper.querySelector("tr");
+
+    // Добавляем строку в таблицу
+    document.getElementById("formset-body").appendChild(newRow);
+    // Увеличиваем счётчик форм
+    totalForms.value = formIndex + 1;
+  });
+
+  // Удаление строки при клике на ".remove-row"
+  document.getElementById("formset-body").addEventListener("click", function(e){
+    if (e.target.classList.contains("remove-row")) {
+      const tr = e.target.closest("tr");
+      const deleteCheckbox = tr.querySelector('input[type="checkbox"]');
+      if (deleteCheckbox) {
+        deleteCheckbox.checked = true;
+        tr.style.display = 'none';
+      } else {
+        tr.remove();
+      }
+    }
+  });
+</script>
+{% endblock %}
