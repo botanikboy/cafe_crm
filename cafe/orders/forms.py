@@ -8,6 +8,13 @@ class ItemOrderForm(forms.ModelForm):
         model = ItemOrder
         fields = ['item', 'amount']
 
+    def clean(self):
+        cleaned_data = super().clean()
+        item = cleaned_data.get('item')
+        if not item:
+            self._errors.pop('amount', None)
+        return cleaned_data
+
 
 ItemOrderFormSet = inlineformset_factory(
     Order, ItemOrder, form=ItemOrderForm,

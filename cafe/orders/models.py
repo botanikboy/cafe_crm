@@ -150,7 +150,9 @@ class Order(models.Model):
     def clean_table_number(self):
         """Forbid empty table on creation, but allow null if table deleted."""
         if not self.table_number and not self.pk:
-            raise ValidationError('Выберите стол перед созданием заказа!')
+            raise ValidationError(
+                {'table_number': 'Выберите стол перед созданием заказа!'}
+            )
 
     def clean(self):
         self.clean_table_number()

@@ -26,20 +26,29 @@
         {{ formset.management_form }}
 
         <div class="mb-3">
-          {% if form.errors %}
+          {% if form.non_field_errors %}
             <div class="alert alert-danger">
-              {{ form.errors }}
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
             </div>
           {% endif %}
           {% if not form.instance.pk %}
-            {% bootstrap_field form.table_number label_class='fs-4 fw-bold' %}
+            <p class="fs-4 fw-bold">{{ form.table_number.label }}</p>
+            {{ form.table_number }}
+            {% if form.table_number.errors %}
+              <div class="text-danger">
+                {{ form.table_number.errors }}
+              </div>
+            {% endif %}
           {% else %}
             <label class="fs-4 fw-bold">Заказ для стола:</label>
             <p tclass="fs-5">{{ form.instance.table_number }}</p>
             {% bootstrap_field form.status label_class='fs-4 fw-bold' %}
           {% endif %}
         </div>
-
+        <hr>
+        <p class="fs-4 fw-bold">Список блюд в заказе</p>
         <div class="table-responsive">
           <table class="table table-hover mb-2 mt-2" id="items-table">
             <colgroup>
