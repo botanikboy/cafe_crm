@@ -1,9 +1,16 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Order, ItemOrder
+
+from .models import Item, ItemOrder, Order
 
 
 class ItemOrderForm(forms.ModelForm):
+    item = forms.ModelChoiceField(
+        queryset=Item.objects.all(),
+        empty_label="Выберите блюдо",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
     class Meta:
         model = ItemOrder
         fields = ['item', 'amount']

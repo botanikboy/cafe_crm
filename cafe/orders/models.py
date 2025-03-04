@@ -44,7 +44,7 @@ class Item(models.Model):
         ordering = ['title']
 
     def __str__(self):
-        return self.title
+        return f'{self.title}, {self.price} руб.'
 
 
 class ItemOrder(models.Model):
@@ -72,7 +72,7 @@ class ItemOrder(models.Model):
         ordering = ['order', 'item']
 
     def __str__(self):
-        return f'{self.item.title} x {self.amount}'
+        return f'{self.item} x {self.amount}'
 
     def save(self, *args, **kwargs):
         """Update total_price on change."""
