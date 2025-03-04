@@ -8,13 +8,13 @@ from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, ListView,
                                   UpdateView)
 
-from .forms import ItemOrderFormSet
+from .forms import ItemOrderFormSet, OrderCreateForm, OrderUpdateForm
 from .models import ItemOrder, Order, Shift
 
 User = get_user_model()
 
 
-class OrderList(ListView, LoginRequiredMixin):
+class OrderList(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
@@ -100,7 +100,7 @@ class OrderFormsetMixin:
 
 
 class OrderCreate(OrderMixing, OrderFormsetMixin, CreateView):
-    fields = ['table_number']
+    form_class = OrderCreateForm
 
 
 class OrderPermissionMixin:
@@ -118,7 +118,7 @@ class OrderPermissionMixin:
 
 class OrderUpdate(
         OrderPermissionMixin, OrderMixing, OrderFormsetMixin, UpdateView):
-    fields = ['status']
+    form_class = OrderUpdateForm
 
 
 class OrderDelete(OrderPermissionMixin, OrderMixing, DeleteView):
@@ -137,7 +137,7 @@ def open_shift(request):
             return redirect("orders:orders_list")
         else:
             return render(
-                request, "index.html", {"error": "Неверный пин-код!"})
+                request, "orders/index.html", {"error": "Неверный пин-код!"})
 
     return render(request, "orders/index.html")
 

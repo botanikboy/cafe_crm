@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Sum
 
 from .models import Item, ItemOrder, Shift, Order, Table
 
@@ -46,10 +47,18 @@ class TableAdmin(admin.ModelAdmin):
 
 
 class ShiftAdmin(admin.ModelAdmin):
-    list_display = ['id', 'waiter', 'date_added', 'date_closed', 'is_active']
+    list_display = ['id', 'waiter', 'date_added', 'date_closed', 'is_active',
+                    'total_revenue']
     search_fields = ['waiter']
     list_filter = ['waiter', 'is_active']
     actions = ['close_selected_shifts']
+
+    @admin.display(description="Выручка за смену")
+    def total_revenue(self, obj):
+        total = obj.orders.filter(status="3_PAID").aggregate(
+            Sum("total_price")
+        )["total_price__sum"] or 0
+        return f"{total:,.2f} руб".replace(",", " ").replace(".", ",")
 
     @admin.action(description="Закрыть выбранные смены")
     def close_selected_shifts(self, request, queryset):
