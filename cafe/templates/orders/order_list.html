@@ -5,15 +5,29 @@ Cafe_CRM. Список заказов
 {% endblock title %}
 
 {% block content %}
+{% if request.resolver_match.view_name == 'orders:orders_list' %}
   <div class="row mt-3">
-  <h1 class="pb-2 mb-0">Список заказов за смену</h1>
+    <h1 class="pb-2 mb-0">Список заказов за смену</h1>
   </div>
   <div class="mb-3">
     <a href="{% url 'orders:order_create' %}" type="button" class="btn btn-primary btn-lg" >+ Создать новый заказ</a>
   </div>
 
   {% include 'orders/includes/filters.html' %}
-
+{% endif %}
+{% if request.resolver_match.view_name == 'orders:close_shift' %}
+  <div class="row mt-3 mb-3">
+    <h1 class="pb-2 mb-0">Итоговая сумма оплаченных заказов: <strong>{{ total_revenue }}</strong></h1>
+  </div>
+  <div class="mb-3">
+    <form action="{% url 'orders:close_shift' %}" method="POST" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-lg" onclick="return confirm('Вы уверены, что хотите закрыть смену?');">
+        Закрыть смену
+      </button>
+    </form>
+  </div>
+{% endif %}
   <article class="mb-3">
     <div class="card">
       <div class="card-body">

@@ -1,10 +1,65 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+User = get_user_model()
 
-class Table(models.Model):
+
+class ActiveObject(models.Model):
+    is_active = models.BooleanField(
+        'Объект активен/актуален',
+        default=True,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class ShiftOrderBase(ActiveObject):
+    date_added = models.DateTimeField(
+        'Время создания',
+        auto_now_add=True,
+        editable=False,
+    )
+    date_closed = models.DateTimeField(
+        'Время закрытия',
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Shift(ShiftOrderBase):
+    waiter = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='shifts',
+        verbose_name='Открыл смену',
+    )
+
+    class Meta:
+        verbose_name = 'Смена'
+        verbose_name_plural = 'Смены'
+        ordering = ['-date_added']
+
+    def __str__(self):
+        opened = timezone.localtime(self.date_added).strftime('%Y-%m-%d %H:%M')
+        return f'Смена {self.id} (от {opened})'
+
+    def close_shift(self):
+        self.date_closed = timezone.now()
+        self.is_active = False
+        self.save()
+        self.orders.filter(status='3_PAID').update(is_active=False)
+        self.orders.exclude(status='3_PAID').update(shift=None)
+
+
+class Table(ActiveObject):
     number = models.SmallIntegerField(
         'Номер',
         unique=True,
@@ -20,7 +75,7 @@ class Table(models.Model):
         return f'Столик №{self.number}'
 
 
-class Item(models.Model):
+class Item(ActiveObject):
     title = models.CharField(
         'Название',
         max_length=128,
@@ -77,9 +132,12 @@ class ItemOrder(models.Model):
     def save(self, *args, **kwargs):
         """Update total_price on change."""
         if self.pk:
-            old_amount = ItemOrder.objects.get(pk=self.pk).amount
-            difference = (self.amount - old_amount) * self.item.price
-            self.order.total_price += difference
+            old_instance = ItemOrder.objects.filter(
+                pk=self.pk).only('amount').first()
+            if old_instance and old_instance.amount != self.amount:
+                difference = (
+                    self.amount - old_instance.amount) * self.item.price
+                self.order.total_price += difference
         else:
             self.order.total_price += self.amount * self.item.price
 
@@ -93,7 +151,7 @@ class ItemOrder(models.Model):
         self.order.save(update_fields=['total_price'])
 
 
-class Order(models.Model):
+class Order(ShiftOrderBase):
     STATUS_CHOICES = [
         ('1_READY', 'готово'),
         ('2_PENDING', 'в ожидании'),
@@ -125,16 +183,12 @@ class Order(models.Model):
         choices=STATUS_CHOICES,
         default='2_PENDING',
     )
-    date_added = models.DateTimeField(
-        'Время создания',
-        auto_now_add=True,
-        editable=False,
-    )
-    date_closed = models.DateTimeField(
-        'Время закрытия',
+
+    shift = models.ForeignKey(
+        Shift,
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True,
-        editable=False,
+        related_name='orders',
     )
 
     class Meta:
@@ -159,8 +213,18 @@ class Order(models.Model):
         self.clean_table_number()
 
     def save(self, *args, **kwargs):
-        """Update date_closed when order is paid."""
+        """Update date_closed when order is paid and bind shift."""
         self.full_clean()
+
+        request = kwargs.pop("request", None)
+
+        if not self.shift and request:
+            active_shift = Shift.objects.filter(
+                waiter=request.user, is_active=True).first()
+            if not active_shift:
+                raise ValidationError("У вас нет открытой смены!")
+            self.shift = active_shift
+
         if self.status == '3_PAID' and self.date_closed is None:
             self.date_closed = timezone.now()
         elif self.status != '3_PAID':

@@ -2,36 +2,38 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'orders:orders_list' %}">
+      <a class="navbar-brand" href="{% url 'orders:index' %}">
         <img src="{% static 'img/logo.png' %}" height="75" class="d-inline-block align-top" alt="">            
-      </a>    
-      <div 
-      class="navbar-toggler" 
-      type="button" 
-      data-toggle="collapse"
-      data-target="#navbarNav" 
-      aria-controls="navbarNav" 
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-      >
-      <span class="navbar-toggler-icon"></span>
-      </div>
-      <div class="collapse navbar-collapse" id="navbarNav">
-      {% with request.resolver_match.view_name as view_name %}                   
-      <ul class="nav nav-pills">
-          <li class="nav-item">
-          <a class="nav-link {% if view_name  == 'orders:orders_list' %}active{% endif %}" href="{% url 'orders:orders_list' %}">
-              Список всех заказов
-          </a> 
-          </li>
-          <li class="nav-item">
-          <a class="nav-link {% if view_name  == 'orders:help' %}active{% endif %}" href="{% url 'orders:help' %}">
-              Инструкция
-          </a> 
-          </li>
-      </ul>
-      {% endwith %}
-      </div>     
+      </a>
+      {% if request.resolver_match.view_name != 'orders:index' %}
+        <div 
+        class="navbar-toggler" 
+        type="button" 
+        data-toggle="collapse"
+        data-target="#navbarNav" 
+        aria-controls="navbarNav" 
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          {% with request.resolver_match.view_name as view_name %}                   
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                <a class="nav-link {% if view_name  == 'orders:orders_list' %}active{% endif %}" href="{% url 'orders:orders_list' %}">
+                    Список всех заказов
+                </a> 
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {% if view_name  == 'orders:close_shift' %}active{% endif %}" href="{% url 'orders:close_shift' %}">
+                      Закрыть смену
+                  </a> 
+                </li>
+            </ul>
+          {% endwith %}
+        </div>
+      {% endif %}  
     </div>
     </nav>
 </header>

@@ -26,6 +26,7 @@
         <div class="col-md-4 text-md-end mt-3 mt-md-0">
           <p class="fs-5 mb-2">Поиск по номеру стола:</p>
           <form method="get" class="d-flex align-items-center">
+            {% csrf_token %}
             <input type="text" name="table" class="form-control form-control-sm me-2" placeholder="Введите номер"
                    value="{{ request.GET.table|default_if_none:'' }}">
             <button type="submit" class="btn btn-outline-primary btn-sm">Поиск</button>

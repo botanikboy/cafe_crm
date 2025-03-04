@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Item, ItemOrder, Order, Table
+from .models import Item, ItemOrder, Shift, Order, Table
 
 
 class ItemInline(admin.TabularInline):
@@ -18,17 +18,18 @@ class ItemInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 'table_number', 'total_price',
-        'status', 'date_added', 'date_closed',
+        'id', 'table_number', 'total_price', 'shift',
+        'status', 'date_added', 'date_closed', 'is_active'
     ]
     search_fields = ['table_number']
-    list_filter = ['table_number', 'status']
+    list_filter = ['table_number', 'status', 'is_active']
     filter_horizontal = ['items']
     inlines = [ItemInline]
 
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'description', 'price']
+    list_display = ['id', 'title', 'description', 'price', 'is_active']
+    list_filter = ['is_active']
     search_fields = ['title']
 
 
@@ -39,11 +40,26 @@ class ItemOrderAdmin(admin.ModelAdmin):
 
 
 class TableAdmin(admin.ModelAdmin):
-    list_display = ['id', 'number']
+    list_display = ['id', 'number', 'is_active']
     search_fields = ['number']
+    list_filter = ['is_active']
+
+
+class ShiftAdmin(admin.ModelAdmin):
+    list_display = ['id', 'waiter', 'date_added', 'date_closed', 'is_active']
+    search_fields = ['waiter']
+    list_filter = ['waiter', 'is_active']
+    actions = ['close_selected_shifts']
+
+    @admin.action(description="Закрыть выбранные смены")
+    def close_selected_shifts(self, request, queryset):
+        for shift in queryset.filter(is_active=True):
+            shift.close_shift()
+        self.message_user(request, f"Закрыто смен: {queryset.count()}")
 
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Table, TableAdmin)
 admin.site.register(ItemOrder, ItemOrderAdmin)
+admin.site.register(Shift, ShiftAdmin)

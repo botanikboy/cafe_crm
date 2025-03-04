@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container d-flex flex-column align-items-center justify-content-center vh-100">
+    <h1 class="text-center mb-4 display-4">Открытие смены</h1>
+
+    <form method="POST" class="text-center">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="pin_code" class="form-label fs-3 d-block text-center">Введите пин-код</label>
+            <input type="password" name="pin_code" id="pin_code" class="form-control text-center fs-2"
+                   maxlength="4" required style="width: 200px; margin: auto;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg px-5">Открыть смену</button>
+    </form>
+</div>
+{% endblock %}
