@@ -1,6 +1,5 @@
 ![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![Django](https://img.shields.io/badge/Django-4+-green)
-![License](https://img.shields.io/badge/license-MIT-yellow)
 
 # Cafe_CRM ☕
 
@@ -84,7 +83,7 @@ pytest
 - 🔲 Разграничение ролей пользователей.
 
 ## 📜 Лицензия
-Проект распространяется под лицензией [MIT](LICENSE).
+Этот проект распространяется на условиях [AGPL-3.0](LICENSE).
 
 ---
 Разработчик: [Ilya Savinkin](https://www.linkedin.com/in/ilya-savinkin-6002a711/)
