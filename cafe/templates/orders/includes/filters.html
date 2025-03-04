@@ -1,0 +1,39 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <p class="fs-5 mb-2">Выбрать заказы по статусу:</p>
+          {% with request.GET.table as table_value %}
+          <a href="{% url 'orders:orders_list' %}{% if table_value %}?table={{ table_value }}{% endif %}"
+             class="btn {% if not request.GET.status %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
+            Все заказы
+          </a>
+          <a href="{% url 'orders:orders_list' %}?status=2_PENDING{% if table_value %}&table={{ table_value }}{% endif %}"
+             class="btn {% if request.GET.status == '2_PENDING' %}btn-secondary{% else %}btn-outline-secondary{% endif %} btn-sm">
+            В ожидании
+          </a>
+          <a href="{% url 'orders:orders_list' %}?status=1_READY{% if table_value %}&table={{ table_value }}{% endif %}"
+             class="btn {% if request.GET.status == '1_READY' %}btn-warning{% else %}btn-outline-warning{% endif %} btn-sm">
+            Готово
+          </a>
+          <a href="{% url 'orders:orders_list' %}?status=3_PAID{% if table_value %}&table={{ table_value }}{% endif %}"
+             class="btn {% if request.GET.status == '3_PAID' %}btn-success{% else %}btn-outline-success{% endif %} btn-sm">
+            Оплачено
+          </a>
+          {% endwith %}
+        </div>
+  
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <p class="fs-5 mb-2">Поиск по номеру стола:</p>
+          <form method="get" class="d-flex align-items-center">
+            <input type="text" name="table" class="form-control form-control-sm me-2" placeholder="Введите номер"
+                   value="{{ request.GET.table|default_if_none:'' }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">Поиск</button>
+          </form>
+          
+        </div>
+        <a href="{% url 'orders:orders_list' %}" class="btn btn-outline-danger mt-2 btn-sm">Сбросить фильтры</a>
+      </div>
+    </div>
+  </div>
+  

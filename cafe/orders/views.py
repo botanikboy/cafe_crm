@@ -12,12 +12,23 @@ class OrderList(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Order.objects.all().prefetch_related(
+        queryset = Order.objects.all().prefetch_related(
             Prefetch(
                 'items_in_order',
                 queryset=ItemOrder.objects.select_related('item')
             )
         ).select_related('table_number').order_by('status', 'date_added')
+
+        status_filter = self.request.GET.get("status")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        table_filter = self.request.GET.get("table")
+        if table_filter:
+            queryset = queryset.filter(
+                table_number__number__icontains=table_filter)
+
+        return queryset
 
 
 class Help(TemplateView):

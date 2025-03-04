@@ -143,8 +143,9 @@ class Order(models.Model):
         ordering = ['-status', 'date_added']
 
     def __str__(self):
+        local_date = timezone.localtime(self.date_added)
         return (
-            f"Заказ {self.id} от {self.date_added.isoformat(' ', 'seconds')}"
+            f"Заказ {self.id} от {local_date.strftime('%Y-%m-%d %H:%M:%S')}"
         )
 
     def clean_table_number(self):
