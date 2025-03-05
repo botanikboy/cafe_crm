@@ -21,7 +21,7 @@ def test_orders_list_view(client, user, shift):
 
 
 @pytest.mark.django_db
-def test_order_create_view(client, user):
+def test_order_create_view(client, user, shift):
     client.force_login(user)
     response = client.get(reverse('orders:order_create'))
     assert response.status_code == 200

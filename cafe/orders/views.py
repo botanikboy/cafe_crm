@@ -1,20 +1,20 @@
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch, Sum, Q
-from django.shortcuts import redirect, render, get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import (CreateView, DeleteView, ListView,
-                                  UpdateView)
+from django.db.models import Prefetch, Q, Sum
+from django.shortcuts import redirect, render
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import ItemOrderFormSet, OrderCreateForm, OrderUpdateForm
+from .forms import OrderCreateForm, OrderUpdateForm
+from .mixins import (ActiveShiftMixin, OrderFormsetMixin, OrderMixing,
+                     OrderPermissionMixin)
 from .models import ItemOrder, Order, Shift
+from .utils import get_active_shift
 
 User = get_user_model()
 
 
-class OrderList(LoginRequiredMixin, ListView):
+class OrderList(LoginRequiredMixin, ActiveShiftMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
@@ -42,82 +42,16 @@ class OrderList(LoginRequiredMixin, ListView):
         return queryset
 
 
-class OrderMixing(LoginRequiredMixin):
-    model = Order
-    success_url = reverse_lazy('orders:orders_list')
-
-
-class OrderFormsetMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        order = getattr(self, 'object', None)
-
-        if self.request.method == 'POST':
-            context['formset'] = ItemOrderFormSet(
-                self.request.POST,
-                instance=order,
-                prefix='form',
-            )
-        else:
-            context['formset'] = ItemOrderFormSet(
-                instance=order,
-                prefix='form',
-            )
-
-        return context
-
-    def assign_shift(self, order, form):
-        if not order.shift:
-            active_shift = Shift.objects.filter(
-                waiter=self.request.user, is_active=True).first()
-            if not active_shift:
-                form.add_error(None, "У вас нет открытой смены!")
-                return False
-            order.shift = active_shift
-        return True
-
-    def form_valid(self, form):
-        formset = ItemOrderFormSet(
-            self.request.POST,
-            instance=self.object,
-            prefix='form',
-        )
-
-        if form.is_valid() and formset.is_valid():
-            order = form.save(commit=False)
-            if not self.assign_shift(order, form):
-                return self.form_invalid(form)
-            order.save()
-            formset.instance = order
-            formset.save()
-            order.update_total_price()
-            return redirect(self.success_url)
-
-        return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-class OrderCreate(OrderMixing, OrderFormsetMixin, CreateView):
+class OrderCreate(
+    OrderMixing, OrderFormsetMixin, ActiveShiftMixin, CreateView
+        ):
     form_class = OrderCreateForm
 
 
-class OrderPermissionMixin:
-    def dispatch(self, request, *args, **kwargs):
-        order = get_object_or_404(Order, pk=self.kwargs["pk"])
-        active_shift = Shift.objects.filter(
-            waiter=request.user, is_active=True).first()
-
-        if not order.is_active or (
-                order.shift and order.shift != active_shift):
-            raise PermissionDenied("Вы не можете изменить этот заказ!")
-
-        return super().dispatch(request, *args, **kwargs)
-
-
 class OrderUpdate(
-        OrderPermissionMixin, OrderMixing, OrderFormsetMixin, UpdateView):
+        OrderPermissionMixin, OrderMixing, OrderFormsetMixin, ActiveShiftMixin,
+        UpdateView
+        ):
     form_class = OrderUpdateForm
 
 
@@ -145,7 +79,7 @@ def open_shift(request):
 @login_required
 def close_shift(request):
     user = request.user
-    shift = get_object_or_404(Shift, waiter=user, is_active=True)
+    shift = get_active_shift(user)
     paid_orders = shift.orders.filter(status='3_PAID', is_active=True)
     total_revenue = paid_orders.aggregate(
         Sum('total_price'))['total_price__sum'] or 0
@@ -158,6 +92,7 @@ def close_shift(request):
     context = {
         'page_obj': paid_orders,
         'total_revenue': total_revenue_display,
+        'shift': shift,
     }
 
     return render(request, "orders/order_list.html", context)

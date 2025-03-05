@@ -40,16 +40,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+STATICFILES_DIRS = [BASE_DIR / 'static_dev']
+
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
     INTERNAL_IPS = ['127.0.0.1']
-    STATIC_DIR = BASE_DIR / 'static_dev'
-    STATICFILES_DIRS = [
-        STATIC_DIR,
-    ]
 else:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static_dev')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 ROOT_URLCONF = 'cafe.urls'
 

@@ -49,7 +49,7 @@ class Shift(ShiftOrderBase):
 
     def __str__(self):
         opened = timezone.localtime(self.date_added).strftime('%Y-%m-%d %H:%M')
-        return f'Смена {self.id} (от {opened})'
+        return f'Смена пользователя {self.waiter} (от {opened})'
 
     def close_shift(self):
         self.date_closed = timezone.now()
