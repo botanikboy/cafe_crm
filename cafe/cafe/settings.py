@@ -28,6 +28,10 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
     'core.apps.CoreConfig',
     'django_bootstrap5',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'api.apps.ApiConfig',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +122,16 @@ AUTH_USER_MODEL = 'users.User'
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 LOGIN_URL = '/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}

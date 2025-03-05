@@ -29,9 +29,11 @@ def test_close_shift(shift, order):
 
 
 @pytest.mark.django_db
-def test_shift_revenue_calculation(shift, order):
-    order.status = '3_PAID'
-    order.save()
-    total_revenue = shift.orders.filter(
-        status='3_PAID').aggregate(total=Sum('total_price'))['total'] or 0
-    assert total_revenue == 250.00
+def test_shift_revenue_calculation(create_shift, create_order):
+    """Тест на расчёт выручки за смену."""
+    create_order.status = '3_PAID'
+    create_order.save()
+    create_shift.close_shift()
+    assert create_shift.orders.filter(status='3_PAID').count() == 1
+    assert create_shift.orders.aggregate(
+        total_sum=Sum('total_price'))['total_sum'] == create_order.total_price
